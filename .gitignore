@@ -20,3 +20,6 @@ __pycache__/
 
 # Ignore demo outputs
 reports/demo_outputs/ 
+
+!nozzle_cfd_run_time.txt
+!airfoil_cfd_run_time.txt
