@@ -1,0 +1,25 @@
+CFD BATCH EXECUTION TIMING REPORT
+INDIVIDUAL CASE TIMINGS:
+Case ID         | NPR        | Time (s)  
+npr_2.0         | 2.0        | 627.71
+npr_2.5         | 2.5        | 630.10
+npr_3.0         | 3.0        | 580.61
+npr_3.5         | 3.5        | 584.93
+npr_4.0         | 4.0        | 560.49
+npr_4.5         | 4.5        | 550.15
+npr_5.0         | 5.0        | 549.91
+npr_5.5         | 5.5        | 549.05
+npr_6.0         | 6.0        | 549.39
+npr_7.0         | 7.0        | 551.24
+npr_8.0         | 8.0        | 545.89
+npr_9.0         | 9.0        | 555.37
+npr_10.0        | 10.0       | 583.86
+npr_11.0        | 11.0       | 555.88
+npr_12.0        | 12.0       | 555.38
+npr_14.0        | 14.0       | 551.80
+npr_16.0        | 16.0       | 557.80
+npr_18.0        | 18.0       | 565.51
+SUMMARY:
+Total Successful Cases Run : 18
+Total Compute Time (s)     : 10205.08
+Average CFD Time/Case (s)  : 566.95

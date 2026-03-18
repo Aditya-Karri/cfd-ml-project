@@ -1,0 +1,26 @@
+; Read the base nozzle case
+/file/read-case "D:/cfd-ml-project/ansys_cases/nozzle_base.cas.h5"
+
+; BOUNDARY CONDITIONS
+; p0 = Gauge Total Pressure
+define/boundary-conditions/set/pressure-inlet inlet () p0 no <TOTAL_PRESSURE> supersonic-or-initial-gauge-pressure no <INITIAL_GAUGE> q
+; Ensure outlet is strictly 100,000 Pa gauge (Operating pressure is 0 Pa)
+define/boundary-conditions/set/pressure-outlet outlet () gauge-pressure no 100000 q
+
+; INITIALIZATION 
+/solve/initialize/hyb-initialization
+/solve/iterate 2000
+
+; EXPORTS & REPORTS
+; 1. Export Wall Static Pressure (1D)
+/file/export/ascii "D:/cfd-ml-project/wall_p_<OUTPUT_PREFIX>.csv" wall () yes pressure () no
+; 2. Export Centerline Mach Number (1D)
+/file/export/ascii "D:/cfd-ml-project/axis_mach_<OUTPUT_PREFIX>.csv" axis () yes mach-number () no
+; 3. Export FULL 2D Field Data
+/file/export/ascii "D:/cfd-ml-project/field_data_<OUTPUT_PREFIX>.csv" interior-part-surface_body () yes pressure mach-number () no q
+; 4. Compute Thrust
+report/forces/wall-forces yes 1 0 yes "D:/cfd-ml-project/thrust_<OUTPUT_PREFIX>.txt"
+; Save Case and Data for this specific NPR run
+/file/write-case-data "nozzle_<OUTPUT_PREFIX>.cas.h5"
+
+/exit yes
