@@ -16,7 +16,7 @@ Initially, I trained two completely separate models using my automated CFD datas
 * **Thrust RMSE:** 10,067 N (27.9% Error)
 * **Mach Curve RMSE:** 0.3116
 
-![Baseline Surrogate Results](baseline_surrogate_results.png)
+![Baseline Surrogate Results](CD_nozzle_baseline_surrogate_results.png)
 
 **The Engineering Critique:** While the baseline models successfully captured the "frozen" under-expanded flow regimes at higher NPRs, they struggled significantly at lower NPRs. Because the two neural networks were completely decoupled, the CNN predicted a highly jagged, unphysical Mach distribution. The model simply didn't "know" that the aerodynamic curve it was drawing had to mathematically relate to the physical thrust being produced at the exit.
 
@@ -29,7 +29,7 @@ Crucially, I introduced a **physics constraint** into the loss function. I appli
 * **Thrust RMSE:** 10,280 N (28.2% Error)
 * **Mach Curve RMSE:** 0.1837 (**41% Improvement**)
 
-![PINN Surrogate Results](pinn_surrogate_results.png)
+![PINN Surrogate Results](CD_nozzle_pinn_surrogate_results.png)
 
 **Why this worked:** The physics constraint functioned exactly as intended. By enforcing the macroscopic thrust balance, the erratic jaggedness of the CNN was completely eliminated. The resulting Mach distribution is mathematically smooth and correctly captures the subsonic acceleration up to the nozzle throat, as well as the initial supersonic expansion.
 
