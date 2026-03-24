@@ -13,6 +13,7 @@ tf.random.set_seed(SEED)
 
 PROJECT_ROOT = r"D:\cfd-ml-project"
 DATA_PATH = os.path.join(PROJECT_ROOT, "data", "datasets", "airfoil_dataset.npz")
+REPORTS_DIR = os.path.join(PROJECT_ROOT, "reports")
 
 data = np.load(DATA_PATH)
 X_raw = data["X"]
@@ -151,6 +152,7 @@ plt.ylabel("Loss")
 plt.title("PINN Training Convergence")
 plt.legend()
 plt.grid(True, alpha=0.3)
+plt.savefig(os.path.join(REPORTS_DIR, "PINN_Training_Convergence.png"), dpi=300)
 plt.show()
 
 # Cp Distribution Check
@@ -171,6 +173,7 @@ plt.gca().invert_yaxis()
 plt.xlabel("x/c")
 plt.ylabel("Pressure Coefficient (Cp)")
 plt.title(f"PINN $c_p$ Prediction vs CFD (AoA = {test_aoa_val:.1f} deg)")
+plt.savefig(os.path.join(REPORTS_DIR, "pinn_cp_prediction.png"), dpi=300)
 plt.legend()
 plt.grid(True, alpha=0.4)
 plt.show()

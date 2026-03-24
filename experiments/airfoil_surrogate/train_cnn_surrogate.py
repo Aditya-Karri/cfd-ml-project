@@ -86,7 +86,7 @@ early_stop = tf.keras.callbacks.EarlyStopping(
     monitor="val_loss"
 )
 
-print("\nStarting CNN surrogate training...")
+print("\nStarting CNN surrogate training")
 history = model.fit(
     aoa_train_scaled, cp_train,
     validation_data=(aoa_val_scaled, cp_val),

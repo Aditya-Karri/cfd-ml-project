@@ -53,7 +53,7 @@ infer_time_sec = (end_time - start_time) / N_runs
 
 # Read Fluent time dynamically automation report
 fluent_time_file = os.path.join(PROJECT_ROOT, "airfoil_cfd_run_time.txt")
-fluent_avg_time = 600.0 # fallback if file is missing
+fluent_avg_time = 710.85 # fallback if file is missing
 if os.path.exists(fluent_time_file):
     with open(fluent_time_file, "r") as f:
         for line in f:

@@ -15,11 +15,6 @@ ansys_cases/*.dat.h5
 # Ignore logs
 logs/
 
-# Ignore Python cache
-__pycache__/
 
 # Ignore demo outputs
 reports/demo_outputs/ 
-
-!nozzle_cfd_run_time.txt
-!airfoil_cfd_run_time.txt
