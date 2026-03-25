@@ -8,17 +8,17 @@ The result is a surrogate model that is up to 246,000x faster than ANSYS Fluent,
 ## The Portfolio Projects
 I tackled two distinct flow regimes to prove this concept. You can dive into the detailed engineering reports, mesh strategies, and failure analyses for each project below:
 
-### 1. Compressible Flow: 2D Axisymmetric CD Nozzle
-* **The Goal:** Predict macroscopic thrust and the 1D centerline Mach distribution based solely on the Nozzle Pressure Ratio (NPR).
-* **The Result:** Achieved a 30,907x speedup (inference drops from ~10 minutes to 0.018 seconds).
-* **The Engineering Challenge:** Standard neural networks struggle violently with the sharp discontinuities of normal shockwaves. I documented a detailed failure analysis of this "Smoothing Effect" and successfully stabilized the predictions using a momentum-conservation physics loss constraint.
-* **Read the full report:** [Nozzle Surrogate Documentation](README_Nozzle.md)
-
-### 2. Incompressible Flow: NACA 0012 Airfoil
+### 1. Incompressible Flow: NACA 0012 Airfoil
 * **The Goal:** Predict Lift, Drag, and a 200-point spatial Pressure Coefficient (Cp) distribution across a sweeping Angle of Attack (AoA).
 * **The Result:** Achieved a ~93,424x Faster speedup with less than 2.0% global force error.
 * **The Engineering Challenge:** Decoupling macroscopic forces from microscopic fluid dynamics. I built a multi-task architecture where a Direct MLP handles the global forces, while an Integral Physics-Informed CNN predicts the spatial curves.
 * **Read the full report:** [Airfoil Surrogate Documentation](README_Airfoil.md)
+
+### 2. Compressible Flow: 2D Axisymmetric CD Nozzle
+* **The Goal:** Predict macroscopic thrust and the 1D centerline Mach distribution based solely on the Nozzle Pressure Ratio (NPR).
+* **The Result:** Achieved a 30,907x speedup (inference drops from ~10 minutes to 0.018 seconds).
+* **The Engineering Challenge:** Standard neural networks struggle violently with the sharp discontinuities of normal shockwaves. I documented a detailed failure analysis of this "Smoothing Effect" and successfully stabilized the predictions using a momentum-conservation physics loss constraint.
+* **Read the full report:** [Nozzle Surrogate Documentation](README_Nozzle.md)
 
 ---
 
