@@ -12,8 +12,9 @@ OUTPUT_FILE = os.path.join(PROJECT_ROOT, "data", "datasets", "airfoil_dataset.np
 
 os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
-NUM_POINTS = 100 
-x_grid = np.linspace(0, 1, NUM_POINTS)
+NUM_POINTS = 150
+beta = np.linspace(0, np.pi, NUM_POINTS)
+x_grid = 0.5 * (1 - np.cos(beta))
 
 # data containers
 X_data = []      
@@ -37,36 +38,43 @@ for case_dir in case_dirs:
         aoa = float(clean_name)
         re_num = 6e6 
     except ValueError:
-        print(f"  [Skip] {case_id}: Could not parse angle.")
+        print(f"Could not parse angle for {case_id}. Moving to next case.")
         continue
 
     # read force history
     hist_files = glob.glob(os.path.join(case_dir, "history_*.out"))
     if not hist_files:
-        print(f"  [Skip] {case_id}: No history file.")
+        print(f"No history file found for {case_id}.")
         continue
         
-    cl, cd = None, None
+    cl_history = []
+    cd_history = []
     try:
         with open(hist_files[0], 'r') as f:
             lines = f.readlines()
             
-        # scan bottom-up for the last valid iteration
+        # scan bottom-up for the last 20 valid iterations
         for line in reversed(lines):
             parts = line.strip().split()
             if len(parts) >= 3:
                 try:
-                    cl = float(parts[1])
-                    cd = float(parts[2])
-                    break
+                    cl_history.append(float(parts[1]))
+                    cd_history.append(float(parts[2]))
+                    if len(cl_history) >= 20:
+                        break
                 except ValueError:
                     continue
                     
-        if cl is None or cd is None:
-            print(f"  [Skip] {case_id}: No valid Cl/Cd found.")
+        if not cl_history or not cd_history:
+            print(f"No valid Cl/Cd data extracted for {case_id}.")
             continue
+            
+        # Average the last iterations
+        cl = np.mean(cl_history)
+        cd = np.mean(cd_history)
+        
     except Exception as e:
-        print(f"  [Error] {case_id} force read: {e}")
+        print(f"Failed to read force history for {case_id}: {e}")
         continue
 
     # read pressure distributions
@@ -74,7 +82,7 @@ for case_dir in case_dirs:
     files_lower = glob.glob(os.path.join(case_dir, "cp_lower_*.csv"))
     
     if not files_upper or not files_lower:
-        print(f"  [Skip] {case_id}: Missing Cp files.")
+        print(f"Missing Cp files for {case_id}.")
         continue
         
     try:
@@ -107,14 +115,14 @@ for case_dir in case_dirs:
         df_u = df_u.dropna(subset=[x_col_u, cp_col_u]).sort_values(x_col_u)
         df_l = df_l.dropna(subset=[x_col_l, cp_col_l]).sort_values(x_col_l)
         
-        # interpolate onto uniform grid
-        interp_u = interp1d(df_u[x_col_u], df_u[cp_col_u], kind='cubic', fill_value="extrapolate")
-        interp_l = interp1d(df_l[x_col_l], df_l[cp_col_l], kind='cubic', fill_value="extrapolate")
+        # interpolate onto uniform grid using linear extrapolation to prevent leading edge spikes
+        interp_u = interp1d(df_u[x_col_u], df_u[cp_col_u], kind='linear', fill_value="extrapolate")
+        interp_l = interp1d(df_l[x_col_l], df_l[cp_col_l], kind='linear', fill_value="extrapolate")
         
         cp_combined = np.concatenate([interp_u(x_grid), interp_l(x_grid)])
         
     except Exception as e:
-        print(f"  [Error] {case_id} Cp processing: {e}")
+        print(f"Cp processing failed for {case_id}: {e}")
         continue
 
     X_data.append([aoa, re_num])
@@ -130,9 +138,9 @@ if len(X_data) > 0:
     y_cl = np.array(y_cl_data)
     y_cd = np.array(y_cd_data)
 
-    print(f"\nProcessing complete. Valid cases: {len(X)}")
+    print(f"\nProcessing complete. Valid cases extracted: {len(X)}")
     np.savez(OUTPUT_FILE, X=X, y_cp=y_cp, y_cl=y_cl, y_cd=y_cd, x_grid=x_grid, case_ids=case_ids)
-    print(f"Dataset saved to {OUTPUT_FILE}")
+    print(f"Dataset successfully saved to {OUTPUT_FILE}")
     
     # Lift Curve plot
     plt.figure(figsize=(8,5))
@@ -145,7 +153,7 @@ if len(X_data) > 0:
     
     lift_plot_path = os.path.join(PROJECT_ROOT, "reports", "dataset_lift_curve.png")
     plt.savefig(lift_plot_path, dpi=300, bbox_inches='tight')
-    print(f"Saved lift curve: {lift_plot_path}")
+    print(f"Saved lift curve plot: {lift_plot_path}")
     
     # Cp Distributions plot
     plt.figure(figsize=(12, 8))
@@ -179,7 +187,7 @@ if len(X_data) > 0:
     
     cp_plot_path = os.path.join(PROJECT_ROOT, "reports", "dataset_cp_distribution.png")
     plt.savefig(cp_plot_path, dpi=300, bbox_inches='tight')
-    print(f"Saved Cp plot: {cp_plot_path}")
+    print(f"Saved Cp distribution plot: {cp_plot_path}")
 
 else:
-    print("\n No valid cases processed.")
+    print("\nNo valid cases were processed")

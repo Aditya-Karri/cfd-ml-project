@@ -50,24 +50,28 @@ def run_case(case_data):
         f.write(jou_content)
     
     log_path = os.path.join(LOG_DIR, f"log_{case_id}.txt")
-    cmd = f"'{FLUENT_CMD}' 2ddp -g -t4 -i '{run_jou_path}'"
+    
+    cmd = f'"{FLUENT_CMD}" 2ddp -g -t4 -i "{run_jou_path}"'
 
     print(f" Launching Fluent... Logs: {log_path}")
     start_time = time.time()
-    with open (run_jou_path, "w") as log_handle:
+    
+    with open(log_path, "w") as log_handle:
         try:
-            subprocess.run(cmd, shell=True,stdout=log_handle, stderr=subprocess.STDOUT, timeout=72000)
+            subprocess.run(cmd, shell=True, stdout=log_handle, stderr=subprocess.STDOUT, timeout=72000)
         except subprocess.TimeoutExpired:
-            print("Timeout Expired")
+            print(" Timeout Expired")
             return False, 0.0
+            
     end_time = time.time()
-    elapsed_time = start_time-end_time
+    elapsed_time = end_time - start_time
     print(f"solve time: {elapsed_time:.1f} seconds")
 
     junk_files = ["cl-rfile.out", "cd-rfile.out", "cl-rfile", "cd-rfile"]
     print(f"cleaning up junk files for {case_id}")
     for junk in junk_files:
-        junk_path = os.path.join(PROJECT_ROOT, "junk")
+        junk_path = os.path.join(PROJECT_ROOT, junk) 
+        
         if os.path.exists(junk_path):
             try:
                 os.remove(junk_path)
@@ -140,23 +144,20 @@ if __name__ == "__main__":
         
         with open(timing_file_path, "w") as f:
             f.write("CFD BATCH EXECUTION TIMING REPORT\n")
-            f.write("=" * 45 + "\n\n")
             
             # Print Individual Case Timings
             f.write("INDIVIDUAL CASE TIMINGS:\n")
             f.write(f"{'Case ID':<15} | {'AoA (deg)':<10} | {'Time (s)':<10}\n")
-            f.write("-" * 45 + "\n")
+
             for ct in case_timings:
                 f.write(f"{ct['case_id']:<15} | {ct['aoa']:<10} | {ct['time']:.2f}\n")
-                f.write("-" * 45 + "\n\n")
-                
-                # Print Summary
-                f.write("SUMMARY:\n")
-                f.write(f"Total Successful Cases Run : {successful_runs}\n")
-                f.write(f"Total Compute Time (s)     : {total_cfd_time:.2f}\n")
-                f.write(f"Average CFD Time/Case (s)  : {avg_time:.2f}\n")
-                
-                print(f"\n Batch complete! Average CFD time per case: {avg_time:.2f} seconds.")
-                print(f" Timing report saved to: {timing_file_path}")
+            
+            f.write("SUMMARY:\n")
+            f.write(f"Total Successful Cases Run : {successful_runs}\n")
+            f.write(f"Total Compute Time (s)     : {total_cfd_time:.2f}\n")
+            f.write(f"Average CFD Time/Case (s)  : {avg_time:.2f}\n")
+            
+        print(f"\n Batch complete! Average CFD time per case: {avg_time:.2f} seconds")
+        print(f" Timing report saved to: {timing_file_path}")
     else:
-        print("\n No cases completed successfully. Timing report not generated.")
+        print("\n No cases completed successfully. Timing report not generated")

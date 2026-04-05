@@ -5,10 +5,10 @@ INDIVIDUAL CASE TIMINGS:
 Case ID         | AoA (deg)  | Time (s)  
 ---------------------------------------------
 minus4deg       | -4.0       | 1086.46
-minus2deg       | -2.0       | 1364.03
-0deg            | 0.0        | 1275.12
+minus2deg       | -2.0       | 965.14
+0deg            | 0.0        | 1114.82
 1deg            | 1.0        | 519.28
-2deg            | 2.0        | 1214.17
+2deg            | 2.0        | 1183.42
 3deg            | 3.0        | 502.06
 4deg            | 4.0        | 737.02
 5deg            | 5.0        | 469.57
@@ -35,5 +35,5 @@ minus2deg       | -2.0       | 1364.03
 
 SUMMARY STATISTICS:
 Total Successful Cases Run : 27
-Total Compute Time (s)     : 19193.01
-Average CFD Time/Case (s)  : 710.85
+Total Compute Time (s)     : 18603.19
+Average CFD Time/Case (s)  : 689
