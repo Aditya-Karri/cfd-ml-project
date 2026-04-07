@@ -84,7 +84,15 @@ model = keras.Sequential([
 ])
 
 optimizer = keras.optimizers.Adam(learning_rate=1e-3)
-LAMBDA_PHYSICS = 0.5 
+LAMBDA_PHYSICS = 10
+
+# Create Trapezoidal Weights Globally
+trapz_weights = tf.ones((NUM_POINTS,), dtype=tf.float32)
+trapz_weights = tf.tensor_scatter_nd_update(
+    trapz_weights, 
+    [[0], [NUM_POINTS-1]], 
+    [0.5, 0.5]
+)
 
 # Custom Physics-Informed Training Step
 @tf.function
@@ -97,7 +105,9 @@ def train_step(x_batch, y_cp_batch, y_cl_batch):
         cp_lower = cp_pred[:, NUM_POINTS:]
         
         dcp = cp_lower - cp_upper
-        cn_pred = tf.reduce_sum(dcp, axis=1, keepdims=True) * dx
+        
+        # Trapezoidal Integration
+        cn_pred = tf.reduce_sum(dcp * trapz_weights, axis=1, keepdims=True) * dx
         
         aoa_real = (x_batch * AOA_STD) + AOA_MEAN
         aoa_rad = aoa_real * (np.pi / 180.0)
@@ -119,7 +129,9 @@ def val_step(x_batch, y_cp_batch, y_cl_batch):
     cp_lower = cp_pred[:, NUM_POINTS:]
     
     dcp = cp_lower - cp_upper
-    cn_pred = tf.reduce_sum(dcp, axis=1, keepdims=True) * dx
+    
+    # Trapezoidal Integration
+    cn_pred = tf.reduce_sum(dcp * trapz_weights, axis=1, keepdims=True) * dx
     
     aoa_real = (x_batch * AOA_STD) + AOA_MEAN
     aoa_rad = aoa_real * (np.pi / 180.0)
