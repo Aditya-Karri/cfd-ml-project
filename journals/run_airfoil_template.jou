@@ -1,41 +1,44 @@
-file/read-case/D:\cfd-ml-project\ansys_cases/airfoil_base.cas.h5
+/file/read-case/D:\cfd-ml-project\ansys_cases/airfoil_base.cas.h5
 
-define/boundary-conditions/velocity-inlet inlet
+/define/boundary-conditions/velocity-inlet inlet
 yes yes no 87.64408163 no 0 no <VX> no <VY> no no yes 0.052 0.009
-
 ;set reference values from inlet
-report/reference-values/compute/velocity-inlet inlet
+/report/reference-values/compute/velocity-inlet inlet
 
 ;set method to coupled
-solve/set/p-v-coupling 24
+/solve/set/p-v-coupling 24
 ;set relaxation factors
-solve/set/pseudo-time-method/relaxation-factors/body-force 0.5
-solve/set/pseudo-time-method/relaxation-factors/density 0.5
-solve/set/pseudo-time-method/relaxation-factors/k 0.75
-solve/set/pseudo-time-method/relaxation-factors/omega 0.75
-solve/set/pseudo-time-method/relaxation-factors/turb-viscosity 0.8
-solve/set/pseudo-time-method/global-time-step-settings no 0.001
+/solve/set/pseudo-time-method/relaxation-factors/body-force 0.5
+/solve/set/pseudo-time-method/relaxation-factors/density 0.5
+/solve/set/pseudo-time-method/relaxation-factors/k 0.75
+/solve/set/pseudo-time-method/relaxation-factors/omega 0.75
+/solve/set/pseudo-time-method/relaxation-factors/turb-viscosity 0.6
+/solve/set/pseudo-time-method/global-time-step-settings no 0.001
 
 ; Drag coefficient monitor
-solve/report-definitions/edit/cd force-vector <VX> <VY> q
+/solve/report-definitions/edit/cd force-vector <VX> <VY> q
 ; Lift coefficient monitor
-solve/report-definitions/edit/cl force-vector <VY_NEG> <VX> q
+/solve/report-definitions/edit/cl force-vector <VY_NEG> <VX> q
 ; Setup Dynamic Report File
-solve/report-files/add/force-history report-defs cl cd () file-name "history_<OUTPUT_PREFIX>.out" print? no q
+/solve/report-files/add/force-history report-defs cl cd () file-name "history_<OUTPUT_PREFIX>.out" print? no q
 
-; set convergence criteria
-solve/monitors/residual/convergence-criteria 1e-05 1e-05 1e-05 1e-05 1e-05 q
+; Disable the default equation residual checks
+/solve/monitors/residual/check-convergence no no no no no q
+
+; Add a custom convergence condition for the Lift Coefficient
+/solve/monitors/convergence/add-edit cl 1e-05 100 20 yes no q
+
 ; Initialize the flow using Hybrid Initialization
-solve/initialize/hyb-initialization
+/solve/initialize/hyb-initialization
 ; Run the calculation
-solve/iterate 2000
+/solve/iterate 2500
 
 ; Save Cp
 ; Export Upper Surface Cp
-file/export/ascii "D:/cfd-ml-project/cp_upper_<OUTPUT_PREFIX>.csv" airfoil_upper () no pressure-coefficient () no
+/file/export/ascii "D:/cfd-ml-project/cp_upper_<OUTPUT_PREFIX>.csv" airfoil_upper () no pressure-coefficient () no
 ; Export Lower Surface Cp
-file/export/ascii "D:/cfd-ml-project/cp_lower_<OUTPUT_PREFIX>.csv" airfoil_lower () no pressure-coefficient () no
+/file/export/ascii "D:/cfd-ml-project/cp_lower_<OUTPUT_PREFIX>.csv" airfoil_lower () no pressure-coefficient () no
 
 ; Save and exit
-file/write-case-data "naca0012_<OUTPUT_PREFIX>.cas.h5"
-exit yes
+/file/write-case-data "naca0012_<OUTPUT_PREFIX>.cas.h5"
+/exit yes

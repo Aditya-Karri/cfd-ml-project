@@ -51,7 +51,7 @@ def run_case(case_data):
     
     log_path = os.path.join(LOG_DIR, f"log_{case_id}.txt")
     
-    cmd = f'"{FLUENT_CMD}" 2ddp -g -t4 -i "{run_jou_path}"'
+    cmd = f'"{FLUENT_CMD}" 2ddp -wait -g -i "{run_jou_path}"'
 
     print(f" Launching Fluent... Logs: {log_path}")
     start_time = time.time()
@@ -80,12 +80,15 @@ def run_case(case_data):
         
     # check convergence
     with open(log_path, "r") as f:
-        if "solution is converged" in f.read():
-            print(" Converged")
+        log_content = f.read().lower()
+        # Check for either the standard message OR our custom monitor name
+        if "solution is converged" in log_content or "cl-converge" in log_content:
+            print(" Converged (Forces Stabilized)")
         else:
-            print(" Reached max iterations")
+            print(" Reached max iterations (Did not fully stabilize)")
+    
     # move files
-    case_dir = os.path.join(PROJECT_ROOT, case_id)
+    case_dir = os.path.join(OUTPUT_DIR, case_id)
     os.makedirs(case_dir, exist_ok=True)
 
     files_to_move = [
